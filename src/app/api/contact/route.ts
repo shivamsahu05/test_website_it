@@ -14,13 +14,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'All fields are required' }, { status: 400 });
     }
 
-    const connection = await mysql.createConnection({
-      host: process.env.MYSQL_HOST,
-      user: process.env.MYSQL_USER,
-      password: process.env.MYSQL_PASSWORD,
-      database: process.env.MYSQL_DATABASE,
-      port: Number(process.env.MYSQL_PORT),
-    });
+    // const connection = await mysql.createConnection({
+    //   host: process.env.MYSQL_HOST,
+    //   user: process.env.MYSQL_USER,
+    //   password: process.env.MYSQL_PASSWORD,
+    //   database: process.env.MYSQL_DATABASE,
+    //   port: Number(process.env.MYSQL_PORT),
+    // });
+    
 
     await connection.execute(
       'INSERT INTO contacts (name, email, message) VALUES (?, ?, ?)',
