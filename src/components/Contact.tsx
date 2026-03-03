@@ -66,14 +66,35 @@ export default function Contact() {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
   const [formState, setFormState] = useState({ name: "", email: "", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setTimeout(() => {
+    setSubmitStatus(null);
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formState),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSubmitStatus({ type: 'success', message: 'Message sent successfully!' });
+        setFormState({ name: "", email: "", message: "" });
+      } else {
+        setSubmitStatus({ type: 'error', message: data.error || 'Failed to send message' });
+      }
+    } catch (error) {
+      setSubmitStatus({ type: 'error', message: 'Network error. Please try again.' });
+    } finally {
       setIsSubmitting(false);
-      setFormState({ name: "", email: "", message: "" });
-    }, 2000);
+    }
   };
 
   return (
@@ -151,6 +172,15 @@ export default function Contact() {
               >
                 {isSubmitting ? "Sending..." : "Send Message"}
               </motion.button>
+              {submitStatus && (
+                <div className={`p-4 rounded-lg text-center ${
+                  submitStatus.type === 'success' 
+                    ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
+                    : 'bg-red-500/20 text-red-400 border border-red-500/30'
+                }`}>
+                  {submitStatus.message}
+                </div>
+              )}
             </form>
           </motion.div>
 
